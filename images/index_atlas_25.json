@@ -1,0 +1,19 @@
+﻿{"frames": {
+
+"Image_1":
+{
+	"frame": {"x":0,"y":0,"w":1461,"h":1746},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":1461,"h":1746},
+	"sourceSize": {"w":1461,"h":1746}
+}},
+"meta": {
+	"app": "Adobe Animate",
+	"version": "24.0.12.2",
+	"image": "index_atlas_25.png",
+	"format": "undefined",
+	"size": {"w":2048,"h":2048},
+	"scale": "1"
+}
+}

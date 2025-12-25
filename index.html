@@ -1,34 +1,72 @@
 <!DOCTYPE html>
-<!--
-	NOTES:
-	1. All tokens are represented by '$' sign in the template.
-	2. You can write your code only wherever mentioned.
-	3. All occurrences of existing tokens will be replaced by their appropriate values.
-	4. Blank lines will be removed automatically.
-	5. Remove unnecessary comments before creating your template.
--->
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="authoring-tool" content="Adobe_Animate_CC">
 <title>index</title>
-<!-- write your code here -->
+<link rel="dns-prefetch" href="https://code.createjs.com">
+<link rel="preconnect" href="https://code.createjs.com" crossorigin>
+<link rel="preload" href="https://code.createjs.com/1.0.0/createjs.min.js" as="script">
+<link rel="preload" href="index.js" as="script">
+<style>
+  #animation_container, #_preload_div_ {
+	position:absolute;
+	margin:auto;
+	left:0;right:0;
+	top:0;bottom:0;
+  }
+</style>
 <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
 <script src="index.js"></script>
 <script>
-var canvas, stage, exportRoot, anim_container, dom_overlay_container, fnStartAnimation;
+var canvas, stage, exportRoot, anim_container, dom_overlay_container, fnStartAnimation, soundLoader;
+(function() {
+	function checkAndInit() {
+		if (typeof AdobeAn !== 'undefined' && typeof createjs !== 'undefined') {
+			init();
+		} else {
+			setTimeout(checkAndInit, 10);
+		}
+	}
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", checkAndInit);
+	} else {
+		checkAndInit();
+	}
+})();
 function init() {
 	canvas = document.getElementById("canvas");
 	anim_container = document.getElementById("animation_container");
 	dom_overlay_container = document.getElementById("dom_overlay_container");
 	var comp=AdobeAn.getComposition("E265253FF40ED148BF28EC2D4EB71FFB");
 	var lib=comp.getLibrary();
+	
+	// 分离图片和音效资源
+	var manifest = lib.properties.manifest;
+	var imageManifest = manifest.filter(function(item) {
+		return item.src.indexOf('.mp3') === -1;
+	});
+	var soundManifest = manifest.filter(function(item) {
+		return item.src.indexOf('.mp3') !== -1;
+	});
+	
+	// 先加载图片资源（关键资源），使用最大并行连接数以加快加载
 	var loader = new createjs.LoadQueue(false);
-	loader.installPlugin(createjs.Sound);
+	loader.setMaxConnections(10); // 增加并行连接数，充分利用HTTP/2多路复用
 	loader.addEventListener("fileload", function(evt){handleFileLoad(evt,comp)});
-	loader.addEventListener("complete", function(evt){handleComplete(evt,comp)});
-	var lib=comp.getLibrary();
-	loader.loadManifest(lib.properties.manifest);
+	loader.addEventListener("complete", function(evt){
+		handleComplete(evt,comp);
+		// 图片加载完成后，延迟加载音效（非关键资源）
+		if(soundManifest.length > 0) {
+			setTimeout(function() {
+				soundLoader = new createjs.LoadQueue(false);
+				soundLoader.installPlugin(createjs.Sound);
+				soundLoader.loadManifest(soundManifest);
+			}, 100);
+		}
+	});
+	loader.loadManifest(imageManifest);
 }
 function handleFileLoad(evt, comp) {
 	var images=comp.getImages();	
@@ -40,9 +78,12 @@ function handleComplete(evt,comp) {
 	var ss=comp.getSpriteSheet();
 	var queue = evt.target;
 	var ssMetadata = lib.ssMetadata;
-	for(i=0; i<ssMetadata.length; i++) {
+	for(var i=0; i<ssMetadata.length; i++) {
 		ss[ssMetadata[i].name] = new createjs.SpriteSheet( {"images": [queue.getResult(ssMetadata[i].name)], "frames": ssMetadata[i].frames} )
 	}
+	var preloaderDiv = document.getElementById("_preload_div_");
+	preloaderDiv.style.display = 'none';
+	canvas.style.display = 'block';
 	exportRoot = new lib.index();
 	stage = new lib.Stage(canvas);
 	stage.enableMouseOver();	
@@ -53,7 +94,7 @@ function handleComplete(evt,comp) {
 		createjs.Ticker.addEventListener("tick", stage);
 	}	    
 	//Code to support hidpi screens and responsive scaling.
-	AdobeAn.makeResponsive(false,'both',false,1,[canvas,anim_container,dom_overlay_container]);	
+	AdobeAn.makeResponsive(true,'both',true,1,[canvas,preloaderDiv,anim_container,dom_overlay_container]);	
 	AdobeAn.compositionLoaded(lib.properties.id);
 	fnStartAnimation();
 }
@@ -62,11 +103,12 @@ function playSound(id, loop, offset) {
 </script>
 <!-- write your code here -->
 </head>
-<body onload="init();" style="margin:0px;">
+<body style="margin:0px;">
 	<div id="animation_container" style="background-color:rgba(255, 255, 255, 1.00); width:1920px; height:1080px">
-		<canvas id="canvas" width="1920" height="1080" style="position: absolute; display: block; background-color:rgba(255, 255, 255, 1.00);"></canvas>
-		<div id="dom_overlay_container" style="pointer-events:none; overflow:hidden; width:1920px; height:1080px; position: absolute; left: 0px; top: 0px; display: block;">
+		<canvas id="canvas" width="1920" height="1080" style="position: absolute; display: none; background-color:rgba(255, 255, 255, 1.00);"></canvas>
+		<div id="dom_overlay_container" style="pointer-events:none; overflow:hidden; width:1920px; height:1080px; position: absolute; left: 0px; top: 0px; display: none;">
 		</div>
 	</div>
+    <div id='_preload_div_' style='position:absolute; top:0; left:0; display: inline-block; height:1080px; width: 1920px; text-align: center;'>	<span style='display: inline-block; height: 100%; vertical-align: middle;'></span>	<img src=images/_preloader.gif style='vertical-align: middle; max-height: 100%'/></div>
 </body>
 </html>

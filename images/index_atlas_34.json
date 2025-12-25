@@ -1,0 +1,35 @@
+﻿{"frames": {
+
+"CachedBmp_13":
+{
+	"frame": {"x":33826260,"y":12,"w":-1040187284,"h":-788529043},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":0,"w":-3,"h":0},
+	"sourceSize": {"w":-3,"h":0}
+},
+"a4aba8255784e0ca46a7dfa8deabe674":
+{
+	"frame": {"x":0,"y":802,"w":1067,"h":800},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":1067,"h":800},
+	"sourceSize": {"w":1067,"h":800}
+},
+"dfe64db3c0906baf9dcbdceccbdc924bjpeg复制":
+{
+	"frame": {"x":0,"y":0,"w":1200,"h":800},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":1200,"h":800},
+	"sourceSize": {"w":1200,"h":800}
+}},
+"meta": {
+	"app": "Adobe Animate",
+	"version": "24.0.12.2",
+	"image": "index_atlas_34.png",
+	"format": "undefined",
+	"size": {"w":2048,"h":2048},
+	"scale": "1"
+}
+}
