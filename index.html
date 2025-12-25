@@ -10,9 +10,12 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="authoring-tool" content="Adobe_Animate_CC">
 <title>index</title>
 <!-- write your code here -->
+<link rel="dns-prefetch" href="https://code.createjs.com">
+<link rel="preconnect" href="https://code.createjs.com" crossorigin>
 <style>
   #animation_container {
 	position:absolute;
@@ -21,8 +24,8 @@
 	top:0;bottom:0;
   }
 </style>
-<script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
-<script src="index.js"></script>
+<script src="https://code.createjs.com/1.0.0/createjs.min.js" defer></script>
+<script src="index.js" defer></script>
 <script>
 var canvas, stage, exportRoot, anim_container, dom_overlay_container, fnStartAnimation;
 function init() {
@@ -31,7 +34,8 @@ function init() {
 	dom_overlay_container = document.getElementById("dom_overlay_container");
 	var comp=AdobeAn.getComposition("E265253FF40ED148BF28EC2D4EB71FFB");
 	var lib=comp.getLibrary();
-	var loader = new createjs.LoadQueue(false);
+	var loader = new createjs.LoadQueue(true);
+	loader.setMaxConnections && loader.setMaxConnections(10);
 	loader.installPlugin(createjs.Sound);
 	loader.addEventListener("fileload", function(evt){handleFileLoad(evt,comp)});
 	loader.addEventListener("complete", function(evt){handleComplete(evt,comp)});
@@ -43,6 +47,7 @@ function handleFileLoad(evt, comp) {
 	if (evt && (evt.item.type == "image")) { images[evt.item.id] = evt.result; }	
 }
 function handleComplete(evt,comp) {
+
 	//This function is always called, irrespective of the content. You can use the variable "stage" after it is created in token create_stage.
 	var lib=comp.getLibrary();
 	var ss=comp.getSpriteSheet();
